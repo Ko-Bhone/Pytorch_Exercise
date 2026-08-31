@@ -304,6 +304,24 @@ class PredictionVisualizer:
         plt.grid(True)
         plt.show()
 
+class ResidualVisualizer:
+    @staticmethod
+    def plot(true, pred):
+        residual = true - pred
+        print("\nRESIDUAL ANALYSIS")
+        print(f"Mean Residual: {residual.mean():,.2f}")
+        print(f"Std Residual: {residual.std():,.2f}")
+        print(f"Min Residual: {residual.min():,.2f}")
+        print(f"Max Residual: {residual.max():,.2f}")
+        plt.figure(figsize=(10,6))
+        plt.scatter(pred, residual, alpha=0.6)
+        plt.axhline(y=0, linestyle='--')
+        plt.xlabel("Predicted House Price")
+        plt.ylabel("Residual (Actual - Predicted)")
+        plt.title("Residual Analysis")
+        plt.grid(True)
+        plt.show()
+
 class HousePriceApp:
     def __init__(self):
         self.config = Config()
@@ -331,6 +349,8 @@ class HousePriceApp:
         evaluator = Evaluator(self.model, self.device)
         pred, true = evaluator.evaluate(test_loader)
         PredictionVisualizer.plot(true, pred)
+        ResidualVisualizer.plot(true, pred)
+
 
 
 if __name__ == "__main__":
