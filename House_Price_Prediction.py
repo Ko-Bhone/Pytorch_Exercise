@@ -19,7 +19,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-
+import matplotlib.pyplot as plt
 
 @dataclass
 class Config:
@@ -275,6 +275,20 @@ class Evaluator:
                 f"Predicted: ${pred[i]:,.2f}")
         return pred, true
 
+class LossVisualizer:
+    @staticmethod
+    def plot(train_losses, val_losses):
+        plt.figure(figsize=(10,6))
+        epochs = range(1, len(train_losses) + 1)
+        plt.plot(epochs, train_losses, label="Train Loss")
+        plt.plot(epochs, val_losses, label="Validation Loss")
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss")
+        plt.title("Training Vs Validation Loss")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
 class HousePriceApp:
     def __init__(self):
         self.config = Config()
@@ -297,7 +311,8 @@ class HousePriceApp:
         self.trainer = Trainer(
             self.model, criterion, optimizer,
             scheduler, self.device, self.config)
-        self.trainer.fit(train_loader, val_loader)
+        train_losses, val_losses = self.trainer.fit(train_loader, val_loader)
+        LossVisualizer.plot(train_losses, val_losses)
         Evaluator(self.model, self.device).evaluate(test_loader)
 
 if __name__ == "__main__":
