@@ -289,6 +289,21 @@ class LossVisualizer:
         plt.grid(True)
         plt.show()
 
+class PredictionVisualizer:
+    @staticmethod
+    def plot(true, pred):
+        plt.figure(figsize=(10,6))
+        plt.scatter(true, pred, alpha=0.6)
+        min_value = min(true.min(), pred.min())
+        max_value = max(true.min(), pred.min())
+        plt.plot([min_value, max_value], [min_value, max_value], color="red", linestyle="--", label="Perfect Prediction")
+        plt.xlabel("Actual House Price")
+        plt.ylabel("Predicted House Price")
+        plt.title("Actual vs Predicted House Price")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
 class HousePriceApp:
     def __init__(self):
         self.config = Config()
@@ -313,7 +328,10 @@ class HousePriceApp:
             scheduler, self.device, self.config)
         train_losses, val_losses = self.trainer.fit(train_loader, val_loader)
         LossVisualizer.plot(train_losses, val_losses)
-        Evaluator(self.model, self.device).evaluate(test_loader)
+        evaluator = Evaluator(self.model, self.device)
+        pred, true = evaluator.evaluate(test_loader)
+        PredictionVisualizer.plot(true, pred)
+
 
 if __name__ == "__main__":
     HousePriceApp().run()
